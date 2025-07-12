@@ -3,8 +3,8 @@ import type { DrizzleError } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
 import slugify from "slug";
 
-import db from "~/lib/db";
-import { InsertLocation, location } from "~/lib/db/schema";
+import { insertLocation } from "~/lib/db/queries/location";
+import { InsertLocation } from "~/lib/db/schema";
 
 const nanoid = customAlphabet("1234567890abcdefghijklmnopqrstuvwxyz", 5);
 export default defineEventHandler(async (event) => {
@@ -40,12 +40,7 @@ export default defineEventHandler(async (event) => {
   // Generate a unique slug by combining slugified name and current datetime in milliseconds
   const slug = slugify(`${result.data.name}-${nanoid()}-${Date.now()}`);
   try {
-    const [created] = await db.insert(location).values({
-      ...result.data,
-      slug,
-      userId: event.context.user.id,
-    }).returning();
-    return created;
+    return await insertLocation(result.data, slug, event.context.user.id);
   }
   catch (e) {
     const error = e as DrizzleError;
