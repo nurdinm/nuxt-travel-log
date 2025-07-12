@@ -15,6 +15,13 @@
       "when": 1751438954918,
       "tag": "0001_condemned_flatman",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1752294774999,
+      "tag": "0002_clear_zombie",
+      "breakpoints": true
     }
   ]
 }
