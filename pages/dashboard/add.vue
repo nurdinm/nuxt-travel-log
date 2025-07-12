@@ -31,7 +31,7 @@ const onSubmit = handleSubmit(async (values) => {
     if (error.data?.data) {
       setErrors(error.data?.data);
     }
-    submitError.value = error.statusMessage || "An unknown error occurred while adding the location.";
+    submitError.value = error.data?.statusMessage || error.statusMessage || "An unknown error occurred while adding the location.";
     // Handle error appropriately, e.g., show a notification
   };
   loading.value = false;
