@@ -2,6 +2,7 @@ import type { DrizzleError } from "drizzle-orm";
 
 import { customAlphabet } from "nanoid";
 import slugify from "slug";
+import { z } from "zod";
 
 import { insertLocation } from "~/lib/db/queries/location";
 import { InsertLocation } from "~/lib/db/schema";
@@ -11,19 +12,9 @@ const nanoid = customAlphabet("1234567890abcdefghijklmnopqrstuvwxyz", 5);
 export default defineAuthenticatedEventHandler(async (event) => {
   const result = await readValidatedBody(event, InsertLocation.safeParse);
   if (!result.success) {
-    const statusMessage = result
-      .error
-      .issues
-      .map(issue => `${issue.path.join("")}: ${issue.message}`)
-      .join("; ");
+    const statusMessage = z.prettifyError(result.error);
 
-    const data = result
-      .error
-      .issues
-      .reduce((errors, issue) => {
-        errors[issue.path.join("")] = issue.message;
-        return errors;
-      }, {} as Record<string, string>);
+    const data = z.flattenError(result.error).fieldErrors;
 
     return sendError(event, createError({
       statusCode: 422,

@@ -19,16 +19,17 @@ export const location = sqliteTable("location", {
 ]);
 
 export const InsertLocation = createInsertSchema(location, {
-  name: field => field.min(1).max(100),
-  description: field => field.max(1000),
-  lat: z.coerce.number().min(-90).max(90),
-  long: z.coerce.number().min(-180).max(180),
-}).omit({
-  id: true,
-  slug: true,
-  userId: true,
-  createdAt: true,
-  updatedAt: true,
-});
+  name: z.string("Name is required").max(100, "Name must not exceed 100 characters"),
+  description: z.string().max(1000, "Description must not exceed 1000 characters").optional(),
+  lat: z.coerce.number("Latitude must be a number").refine(value => value >= -90 && value <= 90, "Latitude is out of acceptable range"),
+  long: z.coerce.number("Longitude must be a number").refine(value => value >= -90 && value <= 90, "Longitude is out of acceptable range"),
+})
+  .omit({
+    id: true,
+    slug: true,
+    userId: true,
+    createdAt: true,
+    updatedAt: true,
+  });
 
 export type InsertLocation = z.infer<typeof InsertLocation>;
